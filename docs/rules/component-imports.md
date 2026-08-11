@@ -20,6 +20,9 @@ Only **component files** are checked — files whose name is PascalCase
 (`Dashboard.tsx`). Files such as `index.tsx`, `date.ts`, or `useThing.ts` are
 ignored. Only **component imports** are checked — an import is treated as a
 component when its default or named binding is PascalCase and not type-only.
+PascalCase requires at least one lowercase letter, so `SCREAMING_SNAKE_CASE`
+constants (e.g. `THIS_CONSTANT`) are never treated as components, even
+though they start with an uppercase letter.
 
 ## Options
 
