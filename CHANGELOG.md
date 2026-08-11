@@ -1,3 +1,10 @@
+## [0.2.1](https://github.com/lapanti/eslint-plugin-fractal/compare/v0.2.0...v0.2.1) (2026-08-11)
+
+
+### Bug Fixes
+
+* don't treat SCREAMING_SNAKE_CASE constants as component imports ([8dc9273](https://github.com/lapanti/eslint-plugin-fractal/commit/8dc9273aae39a882aa10ad6fbabece89d31fda11))
+
 # [0.2.0](https://github.com/lapanti/eslint-plugin-fractal/compare/v0.1.0...v0.2.0) (2026-08-11)
 
 
