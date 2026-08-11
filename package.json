@@ -1,6 +1,6 @@
 {
   "name": "eslint-plugin-fractal",
-  "version": "0.0.0-development",
+  "version": "0.1.0",
   "description": "ESLint plugin that enforces the Fractal React application structure: a component may import components only from the shared components directory or its own same-named child folder, and each file exports a single React component.",
   "keywords": [
     "eslint",
