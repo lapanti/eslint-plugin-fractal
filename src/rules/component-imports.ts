@@ -10,10 +10,13 @@ export type ComponentImportsOptions = [
     rootDir?: string;
     /** Import-path prefix aliases, e.g. `{ "@/": "src/" }`. */
     aliases?: Record<string, string>;
+    /** Also allow importing from a same-named folder (e.g. `components`) at any ancestor directory, not just `sharedDir`. Default: `false`. */
+    allowAncestorSharedDirs?: boolean;
   }?,
 ];
 
-export type ComponentImportsMessageIds = 'crossBranch';
+export type ComponentImportsMessageIds =
+  'crossBranch' | 'crossBranchWithAncestors';
 
 const VIRTUAL = new Set(['<input>', '<text>']);
 
@@ -40,6 +43,7 @@ export default ESLintUtils.RuleCreator.withoutDocs<
             type: 'object',
             additionalProperties: { type: 'string' },
           },
+          allowAncestorSharedDirs: { type: 'boolean' },
         },
         additionalProperties: false,
       },
@@ -47,6 +51,8 @@ export default ESLintUtils.RuleCreator.withoutDocs<
     messages: {
       crossBranch:
         "'{{current}}' may import components only from '{{sharedDir}}' or its own './{{childDir}}/' folder; '{{importPath}}' is outside both.",
+      crossBranchWithAncestors:
+        "'{{current}}' may import components only from '{{sharedDir}}', its own './{{childDir}}/' folder, or an ancestor '{{sharedDirBasename}}' folder; '{{importPath}}' is outside all of them.",
     },
   },
   defaultOptions: [{}],
@@ -62,6 +68,7 @@ export default ESLintUtils.RuleCreator.withoutDocs<
     const cwd = options.rootDir ? path.resolve(options.rootDir) : context.cwd;
     const sharedDir = options.sharedDir ?? 'src/components';
     const aliases = options.aliases ?? {};
+    const allowAncestorSharedDirs = options.allowAncestorSharedDirs ?? false;
 
     const fileDir = path.dirname(filename);
     const childDirName = base.charAt(0).toLowerCase() + base.slice(1);
@@ -69,6 +76,21 @@ export default ESLintUtils.RuleCreator.withoutDocs<
     const sharedRoot = path.isAbsolute(sharedDir)
       ? sharedDir
       : path.resolve(cwd, sharedDir);
+    const sharedDirBasename = path.basename(sharedDir);
+
+    // With allowAncestorSharedDirs, a `<sharedDirBasename>` folder at any
+    // ancestor level (up to rootDir) is also a valid import source — not
+    // just the configured sharedDir itself.
+    const isUnderAncestorSharedDir = (target: string): boolean => {
+      let dir = fileDir;
+      for (;;) {
+        if (under(target, path.resolve(dir, sharedDirBasename))) return true;
+        if (dir === cwd) return false;
+        const parent = path.dirname(dir);
+        if (parent === dir) return false;
+        dir = parent;
+      }
+    };
 
     const importsComponent = (node: TSESTree.ImportDeclaration): boolean => {
       if (node.importKind === 'type') return false;
@@ -104,14 +126,19 @@ export default ESLintUtils.RuleCreator.withoutDocs<
         const resolved = resolveSource(node.source.value);
         if (resolved === null) return;
         if (under(resolved, sharedRoot) || under(resolved, childDir)) return;
+        if (allowAncestorSharedDirs && isUnderAncestorSharedDir(resolved))
+          return;
 
         context.report({
           node,
-          messageId: 'crossBranch',
+          messageId: allowAncestorSharedDirs
+            ? 'crossBranchWithAncestors'
+            : 'crossBranch',
           data: {
             current: base,
             childDir: childDirName,
             sharedDir,
+            sharedDirBasename,
             importPath: node.source.value,
           },
         });
