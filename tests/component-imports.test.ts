@@ -114,6 +114,18 @@ ruleTester.run('component-imports', rule, {
       code: "import Button from '../../ui/Button/Button';",
       options: [{ rootDir: ROOT, sharedDir: 'src/ui' }],
     },
+    {
+      name: 'allowAncestorSharedDirs: imports a components folder at its own directory level',
+      filename: `${ROOT}/src/app/Fizz.tsx`,
+      code: "import Widget from './components/Widget/Widget';",
+      options: [{ rootDir: ROOT, allowAncestorSharedDirs: true }],
+    },
+    {
+      name: 'allowAncestorSharedDirs: a deeply nested file reaches a components folder two ancestor levels up',
+      filename: `${ROOT}/src/app/fizz/buzz/Buzz.tsx`,
+      code: "import Widget from '../../components/Widget/Widget';",
+      options: [{ rootDir: ROOT, allowAncestorSharedDirs: true }],
+    },
   ],
   invalid: [
     {
@@ -173,6 +185,31 @@ ruleTester.run('component-imports', rule, {
       filename: at('src/pages/Dashboard/Dashboard.tsx'),
       code: "import Settings from '../Settings/Settings';",
       errors: [{ messageId: 'crossBranch' }],
+    },
+    {
+      name: 'allowAncestorSharedDirs off: an ancestor components folder is still flagged',
+      filename: `${ROOT}/src/app/Fizz.tsx`,
+      code: "import Widget from './components/Widget/Widget';",
+      options: [{ rootDir: ROOT }],
+      errors: [{ messageId: 'crossBranch' }],
+    },
+    {
+      name: 'allowAncestorSharedDirs on: an unrelated branch is still rejected',
+      filename: `${ROOT}/src/app/Fizz.tsx`,
+      code: "import Widget from '../other/components/Widget/Widget';",
+      options: [{ rootDir: ROOT, allowAncestorSharedDirs: true }],
+      errors: [
+        {
+          messageId: 'crossBranchWithAncestors',
+          data: {
+            current: 'Fizz',
+            childDir: 'fizz',
+            sharedDir: 'src/components',
+            sharedDirBasename: 'components',
+            importPath: '../other/components/Widget/Widget',
+          },
+        },
+      ],
     },
   ],
 });

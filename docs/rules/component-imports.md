@@ -28,6 +28,7 @@ type Options = {
   sharedDir?: string; // default: "src/components"
   rootDir?: string; // default: the ESLint cwd
   aliases?: Record<string, string>; // e.g. { "@/": "src/" }
+  allowAncestorSharedDirs?: boolean; // default: false
 };
 ```
 
@@ -37,6 +38,28 @@ type Options = {
 - **`aliases`** — prefix map so aliased imports resolve to real paths. Without
   it, an aliased import (e.g. `@/pages/...`) is treated as an external package
   and skipped.
+- **`allowAncestorSharedDirs`** — when a tree grows deep enough that a single
+  `src/components` becomes a dumping ground, some branches introduce their own
+  intermediate shared folder (same base name as `sharedDir`, e.g.
+  `components`) partway down the tree:
+
+  ```text
+  src/
+    components/        <- sharedDir
+    App.tsx
+    app/                <- App's own child folder
+      components/       <- intermediate shared, scoped to the "app" branch
+      Fizz.tsx
+      fizz/             <- Fizz's own child folder
+        Buzz.tsx
+  ```
+
+  With this option enabled, `Fizz.tsx`, `Buzz.tsx`, and anything nested under
+  `fizz/` may import from `src/app/components`, in addition to `src/components`
+  and their own same-named child folder — checked at **every** ancestor
+  directory level up to `rootDir`, not just the nearest one. Off by default:
+  it's a real relaxation of the import boundary and should be opted into
+  deliberately.
 
 ## Examples
 
@@ -68,3 +91,6 @@ import type { SettingsProps } from '../Settings/Settings'; // type-only — igno
 - **Aliases are literal prefixes.** Configure `aliases` for each path alias your
   project uses; unrecognized non-relative specifiers are treated as external.
 - **Namespace imports** (`import * as X`) are treated as non-component imports.
+- **`allowAncestorSharedDirs` is purely path arithmetic**, like the rest of the
+  rule — it does not check that an ancestor `components` folder actually
+  exists on disk, only that the import path resolves under one.
