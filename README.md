@@ -63,11 +63,12 @@ export default [
 
 ### `component-imports` options
 
-| Option      | Type                    | Default            | Purpose                                                                                |
-| ----------- | ----------------------- | ------------------ | -------------------------------------------------------------------------------------- |
-| `sharedDir` | `string`                | `"src/components"` | Directory that holds shared, multi‑use components.                                     |
-| `rootDir`   | `string`                | ESLint cwd         | Project root used to resolve `sharedDir` and root‑relative imports.                    |
-| `aliases`   | `Record<string,string>` | `{}`               | Import‑path prefix map, e.g. `{ "@/": "src/" }`, so aliased imports resolve correctly. |
+| Option                    | Type                    | Default            | Purpose                                                                                                            |
+| ------------------------- | ----------------------- | ------------------ | ------------------------------------------------------------------------------------------------------------------ |
+| `sharedDir`               | `string`                | `"src/components"` | Directory that holds shared, multi‑use components.                                                                 |
+| `rootDir`                 | `string`                | ESLint cwd         | Project root used to resolve `sharedDir` and root‑relative imports.                                                |
+| `aliases`                 | `Record<string,string>` | `{}`               | Import‑path prefix map, e.g. `{ "@/": "src/" }`, so aliased imports resolve correctly.                             |
+| `allowAncestorSharedDirs` | `boolean`               | `false`            | Also allow importing from a same‑named folder (e.g. `components`) at any ancestor directory, not just `sharedDir`. |
 
 See the per‑rule docs for examples and the heuristics/limitations that apply.
 
