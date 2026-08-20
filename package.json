@@ -50,6 +50,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
+    "verify:package": "npm run build && node scripts/verify-package.mjs",
     "check": "npm run typecheck && npm run lint && npm run format:check && npm run test:coverage",
     "prepublishOnly": "npm run build"
   },
