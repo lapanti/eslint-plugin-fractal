@@ -2,14 +2,16 @@ name: Approve Renovate PRs
 
 on:
   pull_request:
-    types: [opened, synchronize, reopened]
+    types: [opened, synchronize, reopened, labeled]
 
 permissions:
   pull-requests: write
 
 jobs:
   approve:
-    if: github.event.pull_request.user.login == 'renovate[bot]'
+    if: >-
+      github.event.pull_request.user.login == 'renovate[bot]' &&
+      contains(github.event.pull_request.labels.*.name, 'automerge-approved')
     runs-on: ubuntu-latest
     steps:
       - run: gh pr review --approve "$PR_URL"

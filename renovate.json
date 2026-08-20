@@ -8,6 +8,9 @@
       "matchManagers": ["npm"],
       "matchDepTypes": ["devDependencies"],
       "matchUpdateTypes": ["patch", "minor"],
+      "matchCurrentVersion": ">=1.0.0",
+      "minimumReleaseAge": "3 days",
+      "addLabels": ["automerge-approved"],
       "automerge": true
     }
   ]
