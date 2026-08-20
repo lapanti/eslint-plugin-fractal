@@ -20,8 +20,15 @@ export type ComponentImportsMessageIds =
 
 const VIRTUAL = new Set(['<input>', '<text>']);
 
-const under = (target: string, dir: string): boolean =>
-  target === dir || target.startsWith(dir + path.sep);
+const under = (target: string, dir: string): boolean => {
+  const relative = path.relative(dir, target);
+  return (
+    relative === '' ||
+    (relative !== '..' &&
+      !relative.startsWith(`..${path.sep}`) &&
+      !path.isAbsolute(relative))
+  );
+};
 
 export default ESLintUtils.RuleCreator.withoutDocs<
   ComponentImportsOptions,
@@ -41,7 +48,10 @@ export default ESLintUtils.RuleCreator.withoutDocs<
           rootDir: { type: 'string' },
           aliases: {
             type: 'object',
-            additionalProperties: { type: 'string' },
+            patternProperties: {
+              '.+': { type: 'string' },
+            },
+            additionalProperties: false,
           },
           allowAncestorSharedDirs: { type: 'boolean' },
         },
@@ -60,28 +70,31 @@ export default ESLintUtils.RuleCreator.withoutDocs<
     const filename = context.filename;
     if (!filename || VIRTUAL.has(filename)) return {};
 
-    const base = componentBaseName(filename);
+    const absoluteFilename = path.resolve(context.cwd, filename);
+    const base = componentBaseName(absoluteFilename);
     // Only files that are themselves components are constrained.
     if (!isComponentName(base)) return {};
 
     const options = context.options[0] ?? {};
-    const cwd = options.rootDir ? path.resolve(options.rootDir) : context.cwd;
+    const cwd = path.resolve(context.cwd, options.rootDir ?? '.');
     const sharedDir = options.sharedDir ?? 'src/components';
     const aliases = options.aliases ?? {};
     const allowAncestorSharedDirs = options.allowAncestorSharedDirs ?? false;
 
-    const fileDir = path.dirname(filename);
+    const fileDir = path.dirname(absoluteFilename);
     const childDirName = base.charAt(0).toLowerCase() + base.slice(1);
     const childDir = path.resolve(fileDir, childDirName);
-    const sharedRoot = path.isAbsolute(sharedDir)
-      ? sharedDir
-      : path.resolve(cwd, sharedDir);
-    const sharedDirBasename = path.basename(sharedDir);
+    const sharedRoot = path.resolve(cwd, sharedDir);
+    const sharedDirBasename = path.basename(sharedRoot);
+    const aliasEntries = Object.entries(aliases)
+      .filter(([prefix]) => prefix.length > 0)
+      .sort(([left], [right]) => right.length - left.length);
 
     // With allowAncestorSharedDirs, a `<sharedDirBasename>` folder at any
     // ancestor level (up to rootDir) is also a valid import source — not
     // just the configured sharedDir itself.
     const isUnderAncestorSharedDir = (target: string): boolean => {
+      if (!under(fileDir, cwd)) return false;
       let dir = fileDir;
       for (;;) {
         if (under(target, path.resolve(dir, sharedDirBasename))) return true;
@@ -108,7 +121,7 @@ export default ESLintUtils.RuleCreator.withoutDocs<
     const resolveSource = (source: string): string | null => {
       if (source.startsWith('.')) return path.resolve(fileDir, source);
 
-      for (const [prefix, replacement] of Object.entries(aliases)) {
+      for (const [prefix, replacement] of aliasEntries) {
         if (source === prefix || source.startsWith(prefix)) {
           return path.resolve(cwd, replacement, source.slice(prefix.length));
         }
