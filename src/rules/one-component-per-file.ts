@@ -4,17 +4,19 @@ export type OneComponentPerFileMessageIds = 'multiple';
 
 const PASCAL = /^[A-Z]/;
 
-const superclassIsComponent = (node: TSESTree.ClassDeclaration): boolean => {
+const superclassIsComponent = (
+  node: TSESTree.ClassDeclaration | TSESTree.ClassExpression,
+): boolean => {
   const superClass = node.superClass;
   if (!superClass) return false;
   if (superClass.type === 'Identifier') {
-    return /Component$/.test(superClass.name);
+    return superClass.name.endsWith('Component');
   }
   if (
     superClass.type === 'MemberExpression' &&
     superClass.property.type === 'Identifier'
   ) {
-    return /Component$/.test(superClass.property.name);
+    return superClass.property.name.endsWith('Component');
   }
   return false;
 };
@@ -35,12 +37,37 @@ const pascalId = (
 ): TSESTree.Identifier | null =>
   id !== null && id.type === 'Identifier' && PASCAL.test(id.name) ? id : null;
 
-const varComponentTarget = (
-  node: TSESTree.VariableDeclaration,
-): TSESTree.Identifier | null => {
-  if (node.declarations.length !== 1) return null;
-  const decl = node.declarations[0];
-  return decl ? pascalId(decl.id) : null;
+type InitializerKind = 'class' | 'function';
+
+const initializerKind = (
+  node: TSESTree.Expression | null,
+): InitializerKind | null => {
+  if (!node) return null;
+  if (
+    node.type === 'ArrowFunctionExpression' ||
+    node.type === 'FunctionExpression'
+  ) {
+    return 'function';
+  }
+  if (node.type === 'ClassExpression') {
+    return superclassIsComponent(node) ? 'class' : null;
+  }
+  if (
+    node.type === 'TSAsExpression' ||
+    node.type === 'TSNonNullExpression' ||
+    node.type === 'TSSatisfiesExpression' ||
+    node.type === 'TSTypeAssertion'
+  ) {
+    return initializerKind(node.expression);
+  }
+  if (node.type === 'CallExpression') {
+    for (const argument of node.arguments) {
+      if (argument.type === 'SpreadElement') continue;
+      const kind = initializerKind(argument);
+      if (kind) return kind;
+    }
+  }
+  return null;
 };
 
 interface Frame {
@@ -91,20 +118,37 @@ export default ESLintUtils.RuleCreator.withoutDocs<
       'FunctionDeclaration:exit'(node) {
         if (isTopLevel(node) && pascalId(node.id)) close();
       },
-      VariableDeclaration(node) {
-        if (!isTopLevel(node)) return;
-        const target = varComponentTarget(node);
-        if (target) open(target.name, target, false);
+      VariableDeclarator(node) {
+        if (node.parent.type !== 'VariableDeclaration') return;
+        if (!isTopLevel(node.parent)) return;
+        const target = pascalId(node.id);
+        if (!target) return;
+        const kind = initializerKind(node.init);
+        if (kind === 'class') {
+          components.push({
+            name: target.name,
+            reportNode: target,
+            isComponent: true,
+          });
+        } else if (kind === 'function') {
+          open(target.name, target, false);
+        }
       },
-      'VariableDeclaration:exit'(node) {
-        if (isTopLevel(node) && varComponentTarget(node)) close();
+      'VariableDeclarator:exit'(node) {
+        if (node.parent.type !== 'VariableDeclaration') return;
+        if (!isTopLevel(node.parent)) return;
+        const target = pascalId(node.id);
+        if (target && initializerKind(node.init) === 'function') close();
       },
       ClassDeclaration(node) {
         const id = isTopLevel(node) ? pascalId(node.id) : null;
-        if (id) open(id.name, id, superclassIsComponent(node));
-      },
-      'ClassDeclaration:exit'(node) {
-        if (isTopLevel(node) && pascalId(node.id)) close();
+        if (id && superclassIsComponent(node)) {
+          components.push({
+            name: id.name,
+            reportNode: id,
+            isComponent: true,
+          });
+        }
       },
       JSXElement: markComponent,
       JSXFragment: markComponent,

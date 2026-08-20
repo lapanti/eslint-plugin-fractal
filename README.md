@@ -7,7 +7,7 @@ Two rules keep the component tree honest:
 | Rule                                                                     | What it enforces                                                                                                                                                                          |
 | ------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | [`fractal/component-imports`](docs/rules/component-imports.md)           | A component may import components **only** from the shared components directory (`src/components` by default) or from its own same‑named child folder (`Dashboard.tsx` → `./dashboard/`). |
-| [`fractal/one-component-per-file`](docs/rules/one-component-per-file.md) | A file defines and exports a **single** React component.                                                                                                                                  |
+| [`fractal/one-component-per-file`](docs/rules/one-component-per-file.md) | A file defines **at most one detected top-level** React component.                                                                                                                        |
 
 Together these produce the Fractal shape: one‑off components branch out from a
 single entry point, while multi‑use components live in `src/components` and may

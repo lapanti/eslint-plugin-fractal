@@ -26,6 +26,22 @@ ruleTester.run('one-component-per-file', rule, {
       code: 'const config = { a: 1 };\nexport function Widget() { return <span />; }',
     },
     {
+      name: 'a PascalCase object containing JSX alongside a component',
+      code: 'const Button = { render: () => <button /> };\nexport function App() { return <main />; }',
+    },
+    {
+      name: 'PascalCase JSX data alongside a component',
+      code: 'const Icon = <svg />;\nconst Items = [<span />];\nconst Config = { icon: <i /> };\nexport function App() { return <main />; }',
+    },
+    {
+      name: 'a non-React class containing JSX alongside a component',
+      code: 'class Renderer { render() { return <div />; } }\nexport function App() { return <main />; }',
+    },
+    {
+      name: 'a component and helper in one declaration',
+      code: 'const helper = () => 1, App = () => <main />;',
+    },
+    {
       name: 'only non-component declarations',
       code: 'export function add(a, b) { return a + b; }\nexport const NAME = "x";',
     },
@@ -59,6 +75,33 @@ ruleTester.run('one-component-per-file', rule, {
     {
       name: 'two arrow components',
       code: 'const A = () => <div />;\nexport const B = () => <span />;',
+      errors: [{ messageId: 'multiple', data: { name: 'B' } }],
+    },
+    {
+      name: 'two arrow components in one declaration',
+      code: 'const A = () => <div />, B = () => <span />;',
+      errors: [
+        {
+          messageId: 'multiple',
+          data: { name: 'B' },
+          line: 1,
+          column: 26,
+        },
+      ],
+    },
+    {
+      name: 'a class expression component plus a function component',
+      code: 'const A = class extends React.Component {};\nfunction B() { return <span />; }',
+      errors: [{ messageId: 'multiple', data: { name: 'B' } }],
+    },
+    {
+      name: 'a nested HOC component plus a function component',
+      code: 'const A = memo(observer(() => <div />));\nfunction B() { return <span />; }',
+      errors: [{ messageId: 'multiple', data: { name: 'B' } }],
+    },
+    {
+      name: 'a type-asserted component plus a function component',
+      code: 'const A = (() => <div />) as React.FC;\nfunction B() { return <span />; }',
       errors: [{ messageId: 'multiple', data: { name: 'B' } }],
     },
     {
