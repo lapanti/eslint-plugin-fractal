@@ -3,10 +3,16 @@ import pkg from '../package.json';
 import componentImports from './rules/component-imports';
 import oneComponentPerFile from './rules/one-component-per-file';
 
+export type {
+  ComponentImportsOption,
+  ComponentImportsOptions,
+} from './rules/component-imports';
+
 const plugin = {
   meta: {
     name: pkg.name,
     version: pkg.version,
+    namespace: 'fractal',
   },
   rules: {
     'component-imports': componentImports,

@@ -70,6 +70,9 @@ export default [
 | `aliases`                 | `Record<string,string>` | `{}`               | Nonempty literal prefixes matched longest-first, e.g. `{ "@/": "src/" }`.                                          |
 | `allowAncestorSharedDirs` | `boolean`               | `false`            | Also allow importing from a same‑named folder (e.g. `components`) at any ancestor directory, not just `sharedDir`. |
 
+TypeScript consumers can import `ComponentImportsOption` for the option object
+or `ComponentImportsOptions` for ESLint's options tuple from the package root.
+
 See the per‑rule docs for examples and the heuristics/limitations that apply.
 `component-imports` checks static ES import declarations; re-exports, dynamic
 imports, and CommonJS `require()` calls are outside its scope.
