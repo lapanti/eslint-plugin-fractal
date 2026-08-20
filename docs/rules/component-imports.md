@@ -35,12 +35,18 @@ type Options = {
 };
 ```
 
-- **`sharedDir`** — directory that holds shared, multi-use components.
+- **`sharedDir`** — directory that holds shared, multi-use components. Relative
+  values are resolved from `rootDir`; absolute and relative values are
+  normalized before comparison.
 - **`rootDir`** — project root used to resolve `sharedDir` and root-relative
-  (`src/...`, `/...`) imports.
-- **`aliases`** — prefix map so aliased imports resolve to real paths. Without
-  it, an aliased import (e.g. `@/pages/...`) is treated as an external package
-  and skipped.
+  (`src/...`, `/...`) imports. Relative values are resolved from the ESLint
+  working directory.
+- **`aliases`** — nonempty literal-prefix map so aliased imports resolve to real
+  paths. The longest matching prefix wins, so overlapping aliases are
+  deterministic. Include a trailing `/` when the alias should match a path
+  segment rather than every specifier beginning with the same characters.
+  Without a configured match, an aliased import (e.g. `@/pages/...`) is treated
+  as an external package and skipped.
 - **`allowAncestorSharedDirs`** — when a tree grows deep enough that a single
   `src/components` becomes a dumping ground, some branches introduce their own
   intermediate shared folder (same base name as `sharedDir`, e.g.
@@ -94,6 +100,8 @@ import type { SettingsProps } from '../Settings/Settings'; // type-only — igno
 - **Aliases are literal prefixes.** Configure `aliases` for each path alias your
   project uses; unrecognized non-relative specifiers are treated as external.
 - **Namespace imports** (`import * as X`) are treated as non-component imports.
+- **Only static import declarations are checked.** Re-exports, dynamic
+  `import()`, and CommonJS `require()` calls are outside this rule's scope.
 - **`allowAncestorSharedDirs` is purely path arithmetic**, like the rest of the
   rule — it does not check that an ancestor `components` folder actually
   exists on disk, only that the import path resolves under one.

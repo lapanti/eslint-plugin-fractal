@@ -1,6 +1,7 @@
 import path from 'node:path';
 import { RuleTester } from '@typescript-eslint/rule-tester';
-import { afterAll, describe, it } from 'vitest';
+import { Linter, type ESLint } from 'eslint';
+import { afterAll, describe, expect, it } from 'vitest';
 import rule from '../src/rules/component-imports';
 
 RuleTester.afterAll = afterAll;
@@ -67,6 +68,24 @@ ruleTester.run('component-imports', rule, {
       options: [{ rootDir: ROOT }],
     },
     {
+      name: 'a re-export is outside the static import scope',
+      filename: page,
+      code: "export { Settings } from '../Settings/Settings';",
+      options: [{ rootDir: ROOT }],
+    },
+    {
+      name: 'a dynamic import is outside the static import scope',
+      filename: page,
+      code: "const Settings = import('../Settings/Settings');",
+      options: [{ rootDir: ROOT }],
+    },
+    {
+      name: 'a require call is outside the static import scope',
+      filename: page,
+      code: "const Settings = require('../Settings/Settings');",
+      options: [{ rootDir: ROOT }],
+    },
+    {
       name: 'type-only import (whole declaration) is ignored',
       filename: page,
       code: "import type { SettingsProps } from '../Settings/Settings';",
@@ -88,6 +107,12 @@ ruleTester.run('component-imports', rule, {
       name: 'an index file is not constrained',
       filename: `${ROOT}/src/pages/Dashboard/index.tsx`,
       code: "import Whatever from '../../elsewhere/Whatever';",
+      options: [{ rootDir: ROOT }],
+    },
+    {
+      name: 'virtual input is not constrained',
+      filename: '<input>',
+      code: "import Whatever from '../elsewhere/Whatever';",
       options: [{ rootDir: ROOT }],
     },
     {
@@ -113,6 +138,28 @@ ruleTester.run('component-imports', rule, {
       filename: page,
       code: "import Button from '../../ui/Button/Button';",
       options: [{ rootDir: ROOT, sharedDir: 'src/ui' }],
+    },
+    {
+      name: 'an absolute sharedDir is normalized',
+      filename: page,
+      code: "import Button from '../../components/Button/Button';",
+      options: [
+        {
+          rootDir: ROOT,
+          sharedDir: `${ROOT}/src/app/../components/`,
+        },
+      ],
+    },
+    {
+      name: 'the longest matching alias wins',
+      filename: page,
+      code: "import Button from '@app/components/Button/Button';",
+      options: [
+        {
+          rootDir: ROOT,
+          aliases: { '@': 'wrong/', '@app/': 'src/' },
+        },
+      ],
     },
     {
       name: 'allowAncestorSharedDirs: imports a components folder at its own directory level',
@@ -158,6 +205,13 @@ ruleTester.run('component-imports', rule, {
       code: "import Settings, { helper } from '../Settings/Settings';",
       options: [{ rootDir: ROOT }],
       errors: [{ messageId: 'crossBranch' }],
+    },
+    {
+      name: 'mixed type and value imports still constrain the value component',
+      filename: page,
+      code: "import { type SettingsProps, Settings } from '../Settings/Settings';",
+      options: [{ rootDir: ROOT }],
+      errors: [{ messageId: 'crossBranch', line: 1, column: 1 }],
     },
     {
       name: 'root-absolute import outside the shared dir',
@@ -211,5 +265,61 @@ ruleTester.run('component-imports', rule, {
         },
       ],
     },
+    {
+      name: 'allowAncestorSharedDirs does not walk outside rootDir',
+      filename: '/outside/Fizz.tsx',
+      code: "import Widget from './components/Widget/Widget';",
+      options: [{ rootDir: ROOT, allowAncestorSharedDirs: true }],
+      errors: [{ messageId: 'crossBranchWithAncestors' }],
+    },
   ],
+});
+
+describe('component-imports configuration', () => {
+  const plugin = {
+    rules: { 'component-imports': rule },
+  } as unknown as ESLint.Plugin;
+
+  it('resolves a relative rootDir from the ESLint cwd', () => {
+    const cwd = '/workspace';
+    const linter = new Linter({ cwd });
+    const messages = linter.verify(
+      "import Button from '../../components/Button/Button';",
+      [
+        {
+          files: ['**/*.tsx'],
+          plugins: { fractal: plugin },
+          rules: {
+            'fractal/component-imports': ['error', { rootDir: 'project' }],
+          },
+        },
+      ],
+      `${cwd}/project/src/pages/Dashboard/Dashboard.tsx`,
+    );
+
+    expect(messages).toEqual([]);
+  });
+
+  it('rejects an empty alias prefix', () => {
+    const linter = new Linter({ cwd: ROOT });
+
+    expect(() =>
+      linter.verify(
+        "import Button from '@app/Button';",
+        [
+          {
+            files: ['**/*.tsx'],
+            plugins: { fractal: plugin },
+            rules: {
+              'fractal/component-imports': [
+                'error',
+                { aliases: { '': 'src/' } },
+              ],
+            },
+          },
+        ],
+        page,
+      ),
+    ).toThrow(/should NOT have additional properties/);
+  });
 });
