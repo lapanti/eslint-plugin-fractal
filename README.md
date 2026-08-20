@@ -20,7 +20,7 @@ have their own shared sub‑component folders. Based on the
 npm install --save-dev eslint-plugin-fractal
 ```
 
-Requires Node.js `>=22.14` and ESLint `>=8.57` using
+Requires Node.js `>=22.14` and ESLint `8.57`, `9`, or `10` using
 [flat config](https://eslint.org/docs/latest/use/configure/configuration-files).
 
 ## Usage
@@ -32,6 +32,16 @@ Enable the recommended preset (turns both rules on as errors):
 import fractal from 'eslint-plugin-fractal';
 
 export default [fractal.configs.recommended];
+```
+
+CommonJS flat configs receive the plugin directly, without a `.default`
+property:
+
+```js
+// eslint.config.cjs
+const fractal = require('eslint-plugin-fractal');
+
+module.exports = [fractal.configs.recommended];
 ```
 
 Or wire the rules up yourself, scoped to your components, with options:
@@ -78,14 +88,34 @@ See the per‑rule docs for examples and the heuristics/limitations that apply.
 `component-imports` checks static ES import declarations; re-exports, dynamic
 imports, and CommonJS `require()` calls are outside its scope.
 
+### Monorepos
+
+Use one flat-config block per package when packages have independent Fractal
+roots. Relative `rootDir` values resolve from the ESLint working directory:
+
+```js
+{
+  files: ['packages/app/src/**/*.{jsx,tsx}'],
+  plugins: { fractal },
+  rules: {
+    'fractal/component-imports': ['error', {
+      rootDir: 'packages/app',
+      sharedDir: 'src/components',
+      aliases: { '@app/': 'src/' },
+    }],
+    'fractal/one-component-per-file': 'error',
+  },
+}
+```
+
 ## Development
 
 See [CONTRIBUTING.md](CONTRIBUTING.md). In short:
 
 ```sh
-npm install
+npm ci
 npm run check   # typecheck + lint + format:check + tests with coverage
-npm run build   # emit dist/ (ESM + CJS + d.ts)
+npm run verify:package   # ESM + CJS + types + packed-file validation
 ```
 
 ## Releasing
@@ -94,7 +124,10 @@ Releases are automated with
 [semantic-release](https://semantic-release.gitbook.io/): merging
 [Conventional Commits](https://www.conventionalcommits.org/) to `main`
 determines the next version, publishes to npm, and creates a GitHub release.
-Add a GitHub remote and an `NPM_TOKEN` repository secret to enable it.
+Publishing uses npm trusted publishing through GitHub Actions; no npm token is
+stored in the repository. See [MAINTAINING.md](MAINTAINING.md) for one-time
+configuration and release verification. GitHub Releases are the canonical
+release notes.
 
 ## License
 
