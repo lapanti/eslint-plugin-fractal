@@ -43,12 +43,16 @@ const cjsDeclaration = await readFile('dist/index.d.cts', 'utf8');
 assert.match(esmDeclaration, /plugin as default/);
 assert.match(cjsDeclaration, /export = plugin;/);
 
-const npm = process.platform === 'win32' ? 'npm.cmd' : 'npm';
-const packOutput = execFileSync(
-  npm,
-  ['pack', '--dry-run', '--json', '--ignore-scripts'],
-  { encoding: 'utf8' },
-);
+const packArgs = ['pack', '--dry-run', '--json', '--ignore-scripts'];
+const npmExecPath = process.env.npm_execpath;
+const npmCommand = process.platform === 'win32' ? 'npm.cmd' : 'npm';
+const packOutput = npmExecPath
+  ? execFileSync(process.execPath, [npmExecPath, ...packArgs], {
+      encoding: 'utf8',
+    })
+  : execFileSync(npmCommand, packArgs, {
+      encoding: 'utf8',
+    });
 const [pack] = JSON.parse(packOutput);
 const files = pack.files
   .map(({ path }) => path)
