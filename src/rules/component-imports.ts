@@ -39,6 +39,7 @@ export default createRule<ComponentImportsOptions, ComponentImportsMessageIds>({
       description:
         'Enforce Fractal import boundaries: a component may import components only from the shared components directory or its own same-named child folder',
     },
+    defaultOptions: [{}],
     schema: [
       {
         type: 'object',

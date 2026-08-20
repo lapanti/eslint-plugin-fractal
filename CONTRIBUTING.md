@@ -19,7 +19,7 @@ npm install
 | Script                   | Purpose                                                         |
 | ------------------------ | --------------------------------------------------------------- |
 | `npm run typecheck`      | Type-check with `tsc --noEmit`.                                 |
-| `npm run lint`           | Lint sources with ESLint + typescript-eslint.                   |
+| `npm run lint`           | Lint TypeScript, rule metadata/tests, and Node compatibility.   |
 | `npm run format`         | Format the repository with Prettier.                            |
 | `npm run format:check`   | Verify formatting without writing.                              |
 | `npm test`               | Run the Vitest suite once.                                      |
