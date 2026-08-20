@@ -1,0 +1,69 @@
+name: Bug report
+description: Report incorrect rule behavior or a package compatibility problem.
+title: 'bug: '
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: >-
+        Do not report security vulnerabilities here. Use private vulnerability
+        reporting from the Security tab.
+  - type: dropdown
+    id: area
+    attributes:
+      label: Affected area
+      options:
+        - fractal/component-imports
+        - fractal/one-component-per-file
+        - Plugin configuration or exports
+        - Build, types, or package compatibility
+        - Documentation
+    validations:
+      required: true
+  - type: input
+    id: plugin-version
+    attributes:
+      label: Plugin version
+      placeholder: 1.0.0
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Environment
+      description: Include Node.js, ESLint, parser, and package-manager versions.
+      placeholder: Node 24.10.0, ESLint 10.8.1, @typescript-eslint/parser 8.67.0, npm 11.17.0
+    validations:
+      required: true
+  - type: textarea
+    id: configuration
+    attributes:
+      label: ESLint configuration
+      description: Include the relevant flat-config block and rule options.
+      render: javascript
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Minimal reproduction
+      description: Provide the smallest source example and filename that demonstrate the problem.
+      render: tsx
+    validations:
+      required: true
+  - type: textarea
+    id: behavior
+    attributes:
+      label: Expected and observed behavior
+      description: Explain what you expected and what happened instead, including the full lint message.
+    validations:
+      required: true
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Checks
+      options:
+        - label: I reproduced this with the latest published version.
+          required: true
+        - label: I searched existing issues and pull requests.
+          required: true
