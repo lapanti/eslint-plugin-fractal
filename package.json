@@ -13,7 +13,17 @@
   ],
   "license": "MIT",
   "author": "Lauri Lavanti",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lapanti/eslint-plugin-fractal.git"
+  },
+  "homepage": "https://github.com/lapanti/eslint-plugin-fractal#readme",
+  "bugs": {
+    "url": "https://github.com/lapanti/eslint-plugin-fractal/issues"
+  },
   "type": "module",
+  "sideEffects": false,
+  "packageManager": "npm@11.17.0",
   "exports": {
     ".": {
       "import": {
@@ -28,7 +38,7 @@
   },
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "types": "./dist/index.d.cts",
   "files": [
     "dist",
     "docs",
