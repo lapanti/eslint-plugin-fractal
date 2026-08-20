@@ -28,7 +28,7 @@ execFileSync(
 
 const { Linter } = fixtureRequire('eslint');
 const plugin = fixtureRequire('eslint-plugin-fractal');
-const linter = new Linter();
+const linter = new Linter({ configType: 'flat' });
 const messages = linter.verify(
   'function A() { return <div />; }\nfunction B() { return <span />; }',
   [

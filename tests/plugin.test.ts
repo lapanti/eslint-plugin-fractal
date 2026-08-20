@@ -65,7 +65,7 @@ describe('plugin metadata', () => {
 
 describe('plugin end-to-end (flat config)', () => {
   it('reports a cross-branch import through the plugin', () => {
-    const linter = new Linter();
+    const linter = new Linter({ configType: 'flat' });
     const messages = linter.verify(
       "import Settings from '../Settings/Settings';\nexport default function Dashboard() { return <Settings />; }",
       [
@@ -90,7 +90,7 @@ describe('plugin end-to-end (flat config)', () => {
   });
 
   it('reports an additional component through the plugin', () => {
-    const linter = new Linter();
+    const linter = new Linter({ configType: 'flat' });
     const messages = linter.verify(
       'function A() { return <div />; }\nfunction B() { return <span />; }',
       [

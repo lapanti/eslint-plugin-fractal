@@ -14,7 +14,7 @@ const verifyPlugin = (plugin, format) => {
   assert.equal(plugin.meta.namespace, 'fractal');
   assert.equal(plugin.default, undefined, `${format} exposed a nested default`);
 
-  const linter = new Linter();
+  const linter = new Linter({ configType: 'flat' });
   const messages = linter.verify(
     'function A() { return <div />; }\nfunction B() { return <span />; }',
     [
