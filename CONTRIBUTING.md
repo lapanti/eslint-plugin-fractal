@@ -11,7 +11,7 @@ the release toolchain and npm trusted publishing can run locally and in CI.
 ## Setup
 
 ```sh
-npm install
+npm ci
 ```
 
 ## Scripts
@@ -28,6 +28,7 @@ npm install
 | `npm run verify:package` | Build and verify ESM, CJS, types, and packed files.             |
 | `npm run check`          | Typecheck + lint + format check + coverage. Run before pushing. |
 | `npm run build`          | Bundle `dist/` (ESM + CJS + type declarations) with tsup.       |
+| `npm run release`        | Run semantic-release; maintainers and CI only.                  |
 
 ## Test coverage
 
@@ -50,28 +51,35 @@ src/
   rules/
     component-imports.ts       Fractal import-boundary rule
     one-component-per-file.ts  Single-component-per-file rule
-  utils/ast.ts                 Shared helpers
+  utils/
+    ast.ts                     Shared AST helpers
+    create-rule.ts             Rule factory with canonical documentation URLs
+scripts/                       Packed-package and compatibility smoke checks
 tests/                         Vitest + @typescript-eslint/rule-tester suites
 docs/rules/                    Per-rule reference documentation
 ```
 
 ## Adding a rule
 
-1. Create `src/rules/<name>.ts` using
-   `ESLintUtils.RuleCreator.withoutDocs<Options, MessageIds>({ ... })`.
+1. Create `src/rules/<name>.ts` using the shared `createRule` factory. Include a
+   name, description, schema descriptions, messages, and default options.
 2. Register it in `src/index.ts` under `rules` and in `configs.recommended`.
 3. Add `tests/<name>.test.ts` with valid and invalid cases.
 4. Add `docs/rules/<name>.md`.
 
 The `tests/plugin.test.ts` invariants check that every registered rule has
-complete meta and a matching documentation file, so the suite fails if a step
-is missed.
+complete metadata, a canonical documentation URL, a matching documentation
+file, and an exact recommended-config entry.
 
 ## Commit conventions
 
 Use [Conventional Commits](https://www.conventionalcommits.org/): `feat:`,
 `fix:`, `test:`, `docs:`, `chore:`, `ci:`. Keep commits small and focused. The
 commit types drive automated releases, so use `feat:` and `fix:` deliberately.
+
+Follow ESLint's rule semantic-versioning convention: a fix that reports fewer
+errors can be a patch, while a change that can report new errors requires at
+least a minor release. Removed behavior or dropped compatibility is breaking.
 
 ## Releases
 
@@ -80,6 +88,12 @@ CI on pushes to `main`:
 
 - `fix:` commits publish a patch release, `feat:` a minor, and a
   `BREAKING CHANGE:` footer a major.
-- The version, `CHANGELOG.md`, npm publish, and GitHub release are all handled
-  automatically.
-- Enable it by adding a GitHub remote and an `NPM_TOKEN` repository secret.
+- The committed version remains `0.0.0-development`; semantic-release prepares
+  the publish version only in the release workspace.
+- npm publishing uses OIDC trusted publishing and creates provenance. No
+  `NPM_TOKEN` is used.
+- GitHub Releases are the canonical release notes. `CHANGELOG.md` is archived
+  history through `0.2.1`.
+
+See [MAINTAINING.md](MAINTAINING.md) for repository setup and post-release
+verification.

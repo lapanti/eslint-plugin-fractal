@@ -1,3 +1,8 @@
+# Changelog
+
+This file is archived release history through version 0.2.1. GitHub Releases
+are the canonical release notes for newer versions.
+
 ## [0.2.1](https://github.com/lapanti/eslint-plugin-fractal/compare/v0.2.0...v0.2.1) (2026-08-11)
 
 
