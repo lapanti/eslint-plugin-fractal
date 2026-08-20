@@ -1,0 +1,47 @@
+name: Feature request
+description: Propose a rule behavior, option, compatibility, or documentation improvement.
+title: 'feat: '
+labels: [enhancement]
+body:
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - fractal/component-imports
+        - fractal/one-component-per-file
+        - New rule
+        - Plugin configuration or package compatibility
+        - Documentation
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: Describe the architecture or developer workflow that is not covered today.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed behavior
+      description: Include example valid and invalid code or configuration where relevant.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives and compatibility
+      description: Note workarounds, false-positive risks, and whether this could add new lint reports.
+    validations:
+      required: true
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Checks
+      options:
+        - label: I reviewed the documented rule limitations.
+          required: true
+        - label: I searched existing issues and pull requests.
+          required: true
