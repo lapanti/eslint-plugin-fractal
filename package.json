@@ -46,7 +46,14 @@
     "LICENSE"
   ],
   "engines": {
-    "node": "^18.18.0 || ^20.9.0 || >=21.1.0"
+    "node": ">=22.14.0"
+  },
+  "devEngines": {
+    "runtime": {
+      "name": "node",
+      "version": "^24.10.0",
+      "onFail": "error"
+    }
   },
   "publishConfig": {
     "access": "public"
@@ -60,9 +67,9 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
-    "verify:package": "npm run build && node scripts/verify-package.mjs && publint && attw --pack .",
-    "check": "npm run typecheck && npm run lint && npm run format:check && npm run test:coverage",
-    "prepublishOnly": "npm run build"
+    "verify:package": "node --run build && node scripts/verify-package.mjs && publint && attw --pack .",
+    "check": "node --run typecheck && node --run lint && node --run format:check && node --run test:coverage",
+    "prepublishOnly": "node --run build"
   },
   "dependencies": {
     "@typescript-eslint/utils": "^8.0.0"
@@ -75,7 +82,7 @@
     "@eslint/js": "9.39.5",
     "@semantic-release/changelog": "6.0.3",
     "@semantic-release/git": "10.0.1",
-    "@types/node": "20.19.43",
+    "@types/node": "24.13.3",
     "@typescript-eslint/parser": "8.67.0",
     "@typescript-eslint/rule-tester": "8.67.0",
     "@vitest/coverage-v8": "2.1.9",

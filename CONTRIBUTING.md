@@ -2,8 +2,11 @@
 
 ## Prerequisites
 
-- Node.js `>=18.18` (matches the `engines` field)
-- npm
+- Node.js `24.10` or newer in the Node 24 line (see `.nvmrc`)
+- npm `>=11.5.1`
+
+The published plugin supports Node.js `>=22.14`; development uses Node 24 so
+the release toolchain and npm trusted publishing can run locally and in CI.
 
 ## Setup
 

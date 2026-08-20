@@ -20,7 +20,8 @@ have their own shared sub‑component folders. Based on the
 npm install --save-dev eslint-plugin-fractal
 ```
 
-Requires ESLint `>=8.57` using [flat config](https://eslint.org/docs/latest/use/configure/configuration-files).
+Requires Node.js `>=22.14` and ESLint `>=8.57` using
+[flat config](https://eslint.org/docs/latest/use/configure/configuration-files).
 
 ## Usage
 
