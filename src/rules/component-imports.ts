@@ -108,9 +108,7 @@ export default createRule<ComponentImportsOptions, ComponentImportsMessageIds>({
       for (;;) {
         if (under(target, path.resolve(dir, sharedDirBasename))) return true;
         if (dir === cwd) return false;
-        const parent = path.dirname(dir);
-        if (parent === dir) return false;
-        dir = parent;
+        dir = path.dirname(dir);
       }
     };
 

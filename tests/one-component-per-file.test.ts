@@ -22,6 +22,10 @@ ruleTester.run('one-component-per-file', rule, {
       code: 'function helper() { return 1; }\nexport default function App() { return <div />; }',
     },
     {
+      name: 'an uppercase non-component function alongside a component',
+      code: 'function Helper() { return 1; }\nexport default function App() { return <div />; }',
+    },
+    {
       name: 'a non-component constant alongside a component',
       code: 'const config = { a: 1 };\nexport function Widget() { return <span />; }',
     },
@@ -36,6 +40,14 @@ ruleTester.run('one-component-per-file', rule, {
     {
       name: 'a non-React class containing JSX alongside a component',
       code: 'class Renderer { render() { return <div />; } }\nexport function App() { return <main />; }',
+    },
+    {
+      name: 'non-component class expressions and superclasses alongside a component',
+      code: "const Renderer = class {};\nclass Computed extends React['Component'] { render() { return <div />; } }\nclass Mixed extends mixin(Base) { render() { return <div />; } }\nexport function App() { return <main />; }",
+    },
+    {
+      name: 'an uninitialized uppercase variable alongside a component',
+      code: 'let Config;\nexport function App() { return <main />; }',
     },
     {
       name: 'a component and helper in one declaration',
@@ -62,8 +74,16 @@ ruleTester.run('one-component-per-file', rule, {
       code: 'const Button = forwardRef((props, ref) => <button ref={ref} />);',
     },
     {
+      name: 'a wrapper skips non-function and spread arguments',
+      code: 'const App = wrapper(...items, options, () => <main />);',
+    },
+    {
       name: 'a nested inline component counts as one',
       code: 'export default function App() { const Row = () => <tr />; return <table><Row /></table>; }',
+    },
+    {
+      name: 'nested function and class declarations count toward their parent',
+      code: 'export default function App() { function Row() { return <tr />; } class Model {} return <table><Row /></table>; }',
     },
   ],
   invalid: [

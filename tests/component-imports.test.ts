@@ -134,6 +134,17 @@ ruleTester.run('component-imports', rule, {
       options: [{ rootDir: ROOT, aliases: { '@/': 'src/' } }],
     },
     {
+      name: 'an exact alias resolving into the shared dir is allowed',
+      filename: page,
+      code: "import Button from '@button';",
+      options: [
+        {
+          rootDir: ROOT,
+          aliases: { '@button': 'src/components/Button/Button' },
+        },
+      ],
+    },
+    {
       name: 'custom sharedDir is honoured',
       filename: page,
       code: "import Button from '../../ui/Button/Button';",

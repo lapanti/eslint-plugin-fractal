@@ -16,17 +16,31 @@ npm install
 
 ## Scripts
 
-| Script                  | Purpose                                                         |
-| ----------------------- | --------------------------------------------------------------- |
-| `npm run typecheck`     | Type-check with `tsc --noEmit`.                                 |
-| `npm run lint`          | Lint sources with ESLint + typescript-eslint.                   |
-| `npm run format`        | Format the repository with Prettier.                            |
-| `npm run format:check`  | Verify formatting without writing.                              |
-| `npm test`              | Run the Vitest suite once.                                      |
-| `npm run test:watch`    | Run Vitest in watch mode.                                       |
-| `npm run test:coverage` | Run tests with V8 coverage and thresholds.                      |
-| `npm run check`         | Typecheck + lint + format check + coverage. Run before pushing. |
-| `npm run build`         | Bundle `dist/` (ESM + CJS + type declarations) with tsup.       |
+| Script                   | Purpose                                                         |
+| ------------------------ | --------------------------------------------------------------- |
+| `npm run typecheck`      | Type-check with `tsc --noEmit`.                                 |
+| `npm run lint`           | Lint sources with ESLint + typescript-eslint.                   |
+| `npm run format`         | Format the repository with Prettier.                            |
+| `npm run format:check`   | Verify formatting without writing.                              |
+| `npm test`               | Run the Vitest suite once.                                      |
+| `npm run test:watch`     | Run Vitest in watch mode.                                       |
+| `npm run test:coverage`  | Run tests with V8 coverage and thresholds.                      |
+| `npm run verify:package` | Build and verify ESM, CJS, types, and packed files.             |
+| `npm run check`          | Typecheck + lint + format check + coverage. Run before pushing. |
+| `npm run build`          | Bundle `dist/` (ESM + CJS + type declarations) with tsup.       |
+
+## Test coverage
+
+Coverage thresholds are enforced for every source file, not just in aggregate:
+
+| Metric     | Minimum |
+| ---------- | ------- |
+| Statements | 95%     |
+| Branches   | 90%     |
+| Functions  | 95%     |
+| Lines      | 95%     |
+
+The coverage command emits text, HTML, and `lcov` reports.
 
 ## Project layout
 
