@@ -1,19 +1,20 @@
 import path from 'node:path';
-import { ESLintUtils, type TSESTree } from '@typescript-eslint/utils';
+import type { TSESTree } from '@typescript-eslint/utils';
 import { componentBaseName, isComponentName } from '../utils/ast';
+import { createRule } from '../utils/create-rule';
 
-export type ComponentImportsOptions = [
-  {
-    /** Directory that holds shared, multi-use components. Default: `src/components`. */
-    sharedDir?: string;
-    /** Project root used to resolve `sharedDir` and root-relative imports. Defaults to the ESLint cwd. */
-    rootDir?: string;
-    /** Import-path prefix aliases, e.g. `{ "@/": "src/" }`. */
-    aliases?: Record<string, string>;
-    /** Also allow importing from a same-named folder (e.g. `components`) at any ancestor directory, not just `sharedDir`. Default: `false`. */
-    allowAncestorSharedDirs?: boolean;
-  }?,
-];
+export interface ComponentImportsOption {
+  /** Directory that holds shared, multi-use components. Default: `src/components`. */
+  sharedDir?: string;
+  /** Project root used to resolve `sharedDir` and root-relative imports. Defaults to the ESLint cwd. */
+  rootDir?: string;
+  /** Import-path prefix aliases, e.g. `{ "@/": "src/" }`. */
+  aliases?: Record<string, string>;
+  /** Also allow importing from a same-named folder (e.g. `components`) at any ancestor directory, not just `sharedDir`. Default: `false`. */
+  allowAncestorSharedDirs?: boolean;
+}
+
+export type ComponentImportsOptions = [ComponentImportsOption?];
 
 export type ComponentImportsMessageIds =
   'crossBranch' | 'crossBranchWithAncestors';
@@ -30,10 +31,8 @@ const under = (target: string, dir: string): boolean => {
   );
 };
 
-export default ESLintUtils.RuleCreator.withoutDocs<
-  ComponentImportsOptions,
-  ComponentImportsMessageIds
->({
+export default createRule<ComponentImportsOptions, ComponentImportsMessageIds>({
+  name: 'component-imports',
   meta: {
     type: 'problem',
     docs: {
@@ -44,16 +43,26 @@ export default ESLintUtils.RuleCreator.withoutDocs<
       {
         type: 'object',
         properties: {
-          sharedDir: { type: 'string' },
-          rootDir: { type: 'string' },
+          sharedDir: {
+            type: 'string',
+            description: 'Directory containing shared components.',
+          },
+          rootDir: {
+            type: 'string',
+            description: 'Project root used for path resolution.',
+          },
           aliases: {
             type: 'object',
+            description: 'Nonempty import prefix aliases.',
             patternProperties: {
               '.+': { type: 'string' },
             },
             additionalProperties: false,
           },
-          allowAncestorSharedDirs: { type: 'boolean' },
+          allowAncestorSharedDirs: {
+            type: 'boolean',
+            description: 'Allow same-named shared directories below rootDir.',
+          },
         },
         additionalProperties: false,
       },

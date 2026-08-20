@@ -1,4 +1,5 @@
-import { ESLintUtils, type TSESTree } from '@typescript-eslint/utils';
+import type { TSESTree } from '@typescript-eslint/utils';
+import { createRule } from '../utils/create-rule';
 
 export type OneComponentPerFileMessageIds = 'multiple';
 
@@ -76,13 +77,14 @@ interface Frame {
   isComponent: boolean;
 }
 
-export default ESLintUtils.RuleCreator.withoutDocs<
-  [],
-  OneComponentPerFileMessageIds
->({
+export default createRule<[], OneComponentPerFileMessageIds>({
+  name: 'one-component-per-file',
   meta: {
     type: 'suggestion',
-    docs: { description: 'Enforce a single React component per file' },
+    docs: {
+      description:
+        'Enforce at most one detected top-level React component per file',
+    },
     schema: [],
     messages: {
       multiple:
