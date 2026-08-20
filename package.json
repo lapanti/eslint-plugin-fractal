@@ -74,6 +74,7 @@
     "test:coverage": "vitest run --coverage",
     "verify:package": "node --run build && node scripts/verify-package.mjs && publint && attw --pack .",
     "check": "node --run typecheck && node --run lint && node --run format:check && node --run test:coverage",
+    "release": "semantic-release",
     "prepublishOnly": "node --run build"
   },
   "dependencies": {
