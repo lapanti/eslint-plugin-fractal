@@ -66,6 +66,7 @@ const expectedFiles = [
   'dist/index.d.ts',
   'dist/index.js',
   'dist/index.js.map',
+  'docs/rules/component-export-style.md',
   'docs/rules/component-imports.md',
   'docs/rules/one-component-per-file.md',
   'package.json',

@@ -9,6 +9,12 @@ Two rules keep the component tree honest:
 | [`fractal/component-imports`](docs/rules/component-imports.md)           | A component may import components **only** from the shared components directory (`src/components` by default) or from its own same‑named child folder (`Dashboard.tsx` → `./dashboard/`). |
 | [`fractal/one-component-per-file`](docs/rules/one-component-per-file.md) | A file defines **at most one detected top-level** React component.                                                                                                                        |
 
+And one opt-in rule for teams that want a single export convention:
+
+| Rule                                                                     | What it enforces                                                                                                             |
+| ------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------- |
+| [`fractal/component-export-style`](docs/rules/component-export-style.md) | A file's own component is exported consistently, either as a **named** export (default) or as a **default** export. Fixable. |
+
 Together these produce the Fractal shape: one‑off components branch out from a
 single entry point, while multi‑use components live in `src/components` and may
 have their own shared sub‑component folders. Based on the
@@ -25,7 +31,7 @@ Requires Node.js `>=22.14` and ESLint `8.57`, `9`, or `10` using
 
 ## Usage
 
-Enable the recommended preset (turns both rules on as errors):
+Enable the recommended preset (turns both structural rules on as errors):
 
 ```js
 // eslint.config.js
@@ -68,6 +74,15 @@ export default [
 ];
 ```
 
+`fractal/component-export-style` is not part of the recommended preset. Add it
+explicitly if you want one export convention enforced:
+
+```js
+rules: {
+  'fractal/component-export-style': ['error', { style: 'named' }],
+}
+```
+
 > The plugin does not configure a parser. Use a parser that understands
 > JSX/TSX — for example [`typescript-eslint`](https://typescript-eslint.io/) —
 > or espree with `languageOptions.parserOptions.ecmaFeatures.jsx = true`.
@@ -83,6 +98,20 @@ export default [
 
 TypeScript consumers can import `ComponentImportsOption` for the option object
 or `ComponentImportsOptions` for ESLint's options tuple from the package root.
+
+### `component-export-style` options
+
+| Option  | Type                   | Default   | Purpose                                                           |
+| ------- | ---------------------- | --------- | ----------------------------------------------------------------- |
+| `style` | `"named" \| "default"` | `"named"` | Export style required for the component matching the file's name. |
+
+TypeScript consumers can import `ComponentExportStyleOption` or
+`ComponentExportStyleOptions` from the package root.
+
+The rule is fixable, but `--fix` rewrites only the declaring file and never the
+files importing it. See the
+[rule docs](docs/rules/component-export-style.md) for the cases where a fix is
+deliberately skipped.
 
 See the per‑rule docs for examples and the heuristics/limitations that apply.
 `component-imports` checks static ES import declarations; re-exports, dynamic
