@@ -12,6 +12,16 @@
       "minimumReleaseAge": "3 days",
       "addLabels": ["automerge-approved"],
       "automerge": true
+    },
+    {
+      "description": "typescript-eslint peers on typescript >=4.8.4 <6.1.0; newer majors cannot install.",
+      "matchPackageNames": ["typescript"],
+      "allowedVersions": "<6.1.0"
+    },
+    {
+      "description": "packageManager tracks the npm bundled with the Node lines we test.",
+      "matchPackageNames": ["npm"],
+      "allowedVersions": "<12"
     }
   ]
 }
