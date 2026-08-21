@@ -23,7 +23,7 @@
   },
   "type": "module",
   "sideEffects": false,
-  "packageManager": "npm@11.17.0",
+  "packageManager": "npm@11.19.0",
   "exports": {
     ".": {
       "import": {
@@ -74,7 +74,7 @@
   "devDependencies": {
     "@arethetypeswrong/cli": "0.18.5",
     "@eslint/js": "10.0.1",
-    "@types/node": "24.13.3",
+    "@types/node": "26.2.0",
     "@typescript-eslint/parser": "8.67.0",
     "@typescript-eslint/rule-tester": "8.67.0",
     "@vitest/coverage-v8": "4.1.11",
@@ -85,7 +85,7 @@
     "publint": "0.3.24",
     "semantic-release": "25.0.9",
     "tsup": "8.5.1",
-    "typescript": "5.9.3",
+    "typescript": "6.0.3",
     "typescript-eslint": "8.67.0",
     "vitest": "4.1.11"
   }
