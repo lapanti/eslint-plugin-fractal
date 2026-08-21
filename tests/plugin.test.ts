@@ -3,13 +3,20 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { Linter, type ESLint } from 'eslint';
 import { describe, expect, it } from 'vitest';
-import plugin, { type ComponentImportsOption } from '../src/index';
+import plugin, {
+  type ComponentExportStyleOption,
+  type ComponentImportsOption,
+} from '../src/index';
 
 const docsDir = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
   '../docs/rules',
 );
 const ruleNames = Object.keys(plugin.rules);
+// Rules deliberately excluded from the recommended config.
+const optInRuleNames = ['component-export-style'];
+const sorted = (names: string[]): string[] =>
+  [...names].sort((left, right) => left.localeCompare(right));
 
 describe('plugin metadata', () => {
   it('exposes a meta name and semantic version', () => {
@@ -18,9 +25,13 @@ describe('plugin metadata', () => {
     expect(plugin.meta.namespace).toBe('fractal');
   });
 
-  it('registers the two fractal rules', () => {
+  it('registers every fractal rule', () => {
     expect(ruleNames).toEqual(
-      expect.arrayContaining(['component-imports', 'one-component-per-file']),
+      expect.arrayContaining([
+        'component-export-style',
+        'component-imports',
+        'one-component-per-file',
+      ]),
     );
   });
 
@@ -41,16 +52,27 @@ describe('plugin metadata', () => {
     expect(readdirSync(docsDir)).toContain(`${ruleName}.md`);
   });
 
-  it('recommended config enables every rule', () => {
-    const configured = Object.keys(plugin.configs.recommended.rules ?? {}).sort(
-      (left, right) => left.localeCompare(right),
+  it('recommended config enables every rule that is not opt-in', () => {
+    const configured = sorted(
+      Object.keys(plugin.configs.recommended.rules ?? {}),
     );
-    const expected = ruleNames
-      .map((ruleName) => `fractal/${ruleName}`)
-      .sort((left, right) => left.localeCompare(right));
+    const expected = sorted(
+      ruleNames
+        .filter((ruleName) => !optInRuleNames.includes(ruleName))
+        .map((ruleName) => `fractal/${ruleName}`),
+    );
 
     expect(configured).toEqual(expected);
     expect(plugin.configs.recommended.plugins?.fractal).toBe(plugin);
+  });
+
+  it('keeps opt-in rules registered but out of recommended', () => {
+    const configured = Object.keys(plugin.configs.recommended.rules ?? {});
+
+    for (const ruleName of optInRuleNames) {
+      expect(ruleNames).toContain(ruleName);
+      expect(configured).not.toContain(`fractal/${ruleName}`);
+    }
   });
 
   it('exports the component-import option shape', () => {
@@ -60,6 +82,12 @@ describe('plugin metadata', () => {
     };
 
     expect(options.sharedDir).toBe('src/ui');
+  });
+
+  it('exports the component-export-style option shape', () => {
+    const options: ComponentExportStyleOption = { style: 'default' };
+
+    expect(options.style).toBe('default');
   });
 });
 
