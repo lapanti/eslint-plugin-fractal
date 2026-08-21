@@ -137,6 +137,24 @@ roots. Relative `rootDir` values resolve from the ESLint working directory:
 }
 ```
 
+## Versioning
+
+This package follows [semantic versioning](https://semver.org/), interpreted
+the way ESLint interprets it for linting tools:
+
+| Change                                                                                           | Release |
+| ------------------------------------------------------------------------------------------------ | ------- |
+| A fix that makes a rule report **fewer** problems                                                | patch   |
+| A new rule, a new option, or a change that can report **new** problems                           | minor   |
+| Removing a rule or option, changing a default, or dropping a supported Node.js or ESLint version | major   |
+
+A minor release can therefore surface lint errors that a previous version did
+not report. Pin the version if your build treats new lint errors as failures.
+
+New rules are added outside `fractal/recommended` when they encode a style
+preference rather than the Fractal structure, so extending `recommended` does
+not start reporting a convention you have not opted into.
+
 ## Development
 
 See [CONTRIBUTING.md](CONTRIBUTING.md). In short:
