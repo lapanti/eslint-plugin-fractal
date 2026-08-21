@@ -23,7 +23,7 @@
   },
   "type": "module",
   "sideEffects": false,
-  "packageManager": "npm@11.17.0",
+  "packageManager": "npm@11.19.0",
   "exports": {
     ".": {
       "import": {
