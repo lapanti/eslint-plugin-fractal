@@ -1,6 +1,12 @@
 const PASCAL_CASE = /^[A-Z][A-Za-z0-9]*$/;
 const HAS_LOWERCASE = /[a-z]/;
 
+// ESLint uses these placeholders when linting stdin or inline text.
+const VIRTUAL_FILENAMES = new Set(['<input>', '<text>']);
+
+export const isVirtualFilename = (filename: string): boolean =>
+  VIRTUAL_FILENAMES.has(filename);
+
 export const isComponentName = (name: string): boolean =>
   PASCAL_CASE.test(name) && HAS_LOWERCASE.test(name);
 

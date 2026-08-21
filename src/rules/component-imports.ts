@@ -1,6 +1,10 @@
 import path from 'node:path';
 import type { TSESTree } from '@typescript-eslint/utils';
-import { componentBaseName, isComponentName } from '../utils/ast';
+import {
+  componentBaseName,
+  isComponentName,
+  isVirtualFilename,
+} from '../utils/ast';
 import { createRule } from '../utils/create-rule';
 
 export interface ComponentImportsOption {
@@ -18,8 +22,6 @@ export type ComponentImportsOptions = [ComponentImportsOption?];
 
 export type ComponentImportsMessageIds =
   'crossBranch' | 'crossBranchWithAncestors';
-
-const VIRTUAL = new Set(['<input>', '<text>']);
 
 const under = (target: string, dir: string): boolean => {
   const relative = path.relative(dir, target);
@@ -78,7 +80,7 @@ export default createRule<ComponentImportsOptions, ComponentImportsMessageIds>({
   defaultOptions: [{}],
   create(context) {
     const filename = context.filename;
-    if (!filename || VIRTUAL.has(filename)) return {};
+    if (!filename || isVirtualFilename(filename)) return {};
 
     const absoluteFilename = path.resolve(context.cwd, filename);
     const base = componentBaseName(absoluteFilename);

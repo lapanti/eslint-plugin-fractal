@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { componentBaseName, isComponentName } from '../src/utils/ast';
+import {
+  componentBaseName,
+  isComponentName,
+  isVirtualFilename,
+} from '../src/utils/ast';
 
 describe('isComponentName', () => {
   it.each(['Button', 'MyComponent', 'Ab'])(
@@ -51,4 +55,20 @@ describe('componentBaseName', () => {
   it('handles filenames with no directory', () => {
     expect(componentBaseName('Button.tsx')).toBe('Button');
   });
+});
+
+describe('isVirtualFilename', () => {
+  it.each(['<input>', '<text>'])(
+    'returns true for the ESLint placeholder "%s"',
+    (name) => {
+      expect(isVirtualFilename(name)).toBe(true);
+    },
+  );
+
+  it.each(['src/pages/Dashboard/Dashboard.tsx', 'Button.tsx', ''])(
+    'returns false for the real filename "%s"',
+    (name) => {
+      expect(isVirtualFilename(name)).toBe(false);
+    },
+  );
 });
