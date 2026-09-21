@@ -82,7 +82,7 @@
     "eslint": "10.10.0",
     "eslint-plugin-eslint-plugin": "7.6.2",
     "eslint-plugin-n": "18.3.0",
-    "prettier": "3.9.7",
+    "prettier": "3.9.8",
     "publint": "0.3.24",
     "semantic-release": "25.0.9",
     "tsup": "8.5.1",
